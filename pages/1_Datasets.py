@@ -23,7 +23,7 @@ def highlight_rows(row):
     elif row['status'] == 'Pending':
         return ['background-color: lightyellow'] * len(row)
     elif row['status'] == 'Error':
-        return ['background-color: lightred'] * len(row)
+        return ['background-color: lightcoral'] * len(row)
     else:
         return [''] * len(row)
 
