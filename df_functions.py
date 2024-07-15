@@ -31,14 +31,20 @@ def calculate_additional_metrics(df):
         })
     return pd.DataFrame(column_metrics)
 
+def get_df_correlation(df:pd.DataFrame,target_col:str):
+    categorical_columns = df.select_dtypes(include=['object']).columns
+    numerical_columns = list(set(list(df.columns)) - set(categorical_columns))
+    df = df[numerical_columns]
+    corr = df.corr(method="spearman")
+    return corr
+
 def get_file_details(df: pd.DataFrame, target_col: str):
     basic_details = get_basic_details(df)
     column_info = get_columns_and_dtypes(df)
     summary_df = df.describe().T
     summary_df = pd.merge(column_info, summary_df, right_index=True, left_on='Column Name', how='left')
-
     additional_metrics_df = calculate_additional_metrics(df)
-
     metrics_df = pd.merge(summary_df, additional_metrics_df, left_on='Column Name', right_on='Column Name', how='left')
+    corr = get_df_correlation(df,target_col)
 
-    return basic_details, metrics_df
+    return basic_details, metrics_df, corr

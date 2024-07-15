@@ -1,3 +1,4 @@
+from turtle import color
 import streamlit as st
 import pandas as pd
 from supabase import create_client, Client
@@ -24,11 +25,11 @@ if 'id' in st.query_params:
     
     if dataset:
         st.write(f"**ID:** {dataset['id']}")        
-
         if st.button("View Data"):
             try:
+                st.write('sample data')
                 df = pd.read_csv(f'uploads/{dataset["id"]}.csv')
-                st.dataframe(df)
+                st.dataframe(df.head())
             except FileNotFoundError:
                 st.error("File not found. It may have been moved or deleted.")
     else:

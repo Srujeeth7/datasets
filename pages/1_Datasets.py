@@ -5,6 +5,8 @@ from supabase.lib.client_options import ClientOptions
 
 st.set_page_config(page_title="Datasets", page_icon="📊")
 
+
+
 @st.cache_resource
 def init_connection():
     url = st.secrets["supabase"]["url"]
@@ -13,6 +15,12 @@ def init_connection():
     return create_client(url, key, options=opts)
 
 supabase = init_connection()
+
+
+@st.cache_resource 
+def fetch_dataset_details_from_db():
+    response = supabase.table("datasets").select("*").execute()
+    return response.data
 
 def generate_url(row_id):
     return f"http://localhost:8501/Dataset_Details?id={row_id}"
@@ -29,12 +37,16 @@ def highlight_rows(row):
 
 st.title("Datasets")
 
-if st.button("Create Dataset"):
-    st.switch_page("pages/2_Create_Dataset.py")
+col1, col2, col3 = st.columns([1, 4, 1])
 
-response = supabase.table("datasets").select("*").execute()
-datasets = response.data
+with col1:
+    if st.button("Create Dataset"):
+        st.switch_page("pages/2_Create_Dataset.py")
 
+datasets = fetch_dataset_details_from_db()
+with col3:
+    if st.button("Refresh Data"):
+        datasets = fetch_dataset_details_from_db()
 if datasets:
     df = pd.DataFrame(datasets)
     df["View Details"] = df['id'].apply(lambda x: f"<a target='_blank' href='{generate_url(x)}'>View Details</a>")

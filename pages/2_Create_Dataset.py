@@ -4,7 +4,8 @@ import os
 from supabase import create_client, Client
 from supabase.lib.client_options import ClientOptions
 from df_functions import get_file_details
-import time 
+import time
+from st_material_table import st_material_table
 
 st.set_page_config(page_title="Create Dataset", page_icon="➕")
 
@@ -26,6 +27,7 @@ if uploaded_file is not None:
     
     st.write("Preview of the uploaded CSV:")
     st.write(df.head())
+    # st_material_table(df.head())
 
     columns = df.columns.tolist()
     data_types = df.dtypes.astype(str).tolist()
@@ -36,10 +38,17 @@ if uploaded_file is not None:
         if df is None:
             st.error('Please upload the df first')
         else:
-            st.write("Columns and Data Types:")
-            basic_details, column_info = get_file_details(df, target_col)
-            st.write("Number of Rows:", basic_details['Rows'], "Number of Columns:", basic_details['Columns'])
-            st.write(column_info)
+            basic_details, column_info, corr = get_file_details(df, target_col)
+            tab_size,tab_basic_details, tab_correlation = st.tabs(["Size","Basic Details","Correlation"])
+            with tab_size:
+                st.header("Data Shape")
+                st.write("Number of Rows:", basic_details['Rows'], "Number of Columns:", basic_details['Columns'])
+            with tab_basic_details:
+                st.header("Feature Info")
+                st.write(column_info)
+            with tab_correlation:
+                st.header("Correlation (Non Categorical)")
+                st.write(corr)
 
     if st.button(label="submit"):
         table_name = "datasets"
